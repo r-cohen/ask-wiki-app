@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.r.cohen.askwiki.MainViewModel" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        app:customBackColor="@{viewModel.backgroundColor}"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".MainActivity">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewMic"
+            app:visibleGone="@{!viewModel.isSpeaking}"
+            app:cardTouchDown="@{viewModel::startSpeechRecognition}"
+            app:cardTouchUp="@{viewModel::stopSpeechRecognition}"
+            app:customCardElevation="@{viewModel.recognizingSpeech ? 1f : 40f}"
+            android:layout_width="@dimen/big_btn_size"
+            android:layout_height="@dimen/big_btn_size"
+            app:cardCornerRadius="@dimen/big_btn_radius"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/big_btn_icon_padding"
+                android:src="@drawable/ic_baseline_mic_24" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewStop"
+            app:visibleGone="@{viewModel.isSpeaking}"
+            android:onClick="@{() -> viewModel.stopSpeaking()}"
+            android:layout_width="@dimen/big_btn_size"
+            android:layout_height="@dimen/big_btn_size"
+            app:cardCornerRadius="@dimen/big_btn_radius"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/big_btn_icon_padding"
+                android:src="@drawable/ic_baseline_stop_24" />
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
