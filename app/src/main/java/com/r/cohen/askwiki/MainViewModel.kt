@@ -100,12 +100,13 @@ class MainViewModel: ViewModel() {
 
                     CoroutineScope(Dispatchers.IO).launch {
                         WitAiApi.parseQuestionForEntity(sentence)?.let { entity ->
-                            WikiApi.getWikiContent(entity)?.let { htmlResponse ->
-                                val textResponse = Html.fromHtml(htmlResponse, Html.FROM_HTML_MODE_COMPACT)
-                                Log.d(tag, "wiki response: $textResponse")
-
-                                // talk it
-                                speak(textResponse.toString())
+                            WikiApi.searchWiki(entity)?.let { searchResult ->
+                                Log.d(tag, "searchResult $searchResult")
+                                WikiApi.getWikiContent(searchResult.articleName)?.let { result ->
+                                    Log.d(tag, "result $result")
+                                    val textResponse = Html.fromHtml(result, Html.FROM_HTML_MODE_COMPACT)
+                                    speak(textResponse.toString())
+                                } ?: handleParseFailure()
                             } ?: handleParseFailure()
                         } ?: handleParseFailure()
                     }
