@@ -15,7 +15,6 @@ object WikiApi {
         .build()
         .create(WikiService::class.java)
 
-    //@Suppress("BlockingMethodInNonBlockingContext")
     suspend fun getWikiContent(query: String): String? {
         try {
             val response = apiClient.getTitles(titles = query)
