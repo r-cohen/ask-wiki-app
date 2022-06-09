@@ -3,11 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
+        <import type="com.r.cohen.askwiki.models.CycleState"/>
         <variable
             name="viewModel"
             type="com.r.cohen.askwiki.MainViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/backgroundLayout"
         app:customBackColor="@{viewModel.backgroundColor}"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -16,7 +18,7 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardViewMic"
-            app:visibleGone="@{!viewModel.isSpeaking}"
+            app:visibleGone="@{viewModel.state == CycleState.IDLE}"
             app:cardTouchDown="@{viewModel::startSpeechRecognition}"
             app:cardTouchUp="@{viewModel::stopSpeechRecognition}"
             app:customCardElevation="@{viewModel.recognizingSpeech ? 1f : 40f}"
@@ -36,7 +38,7 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardViewStop"
-            app:visibleGone="@{viewModel.isSpeaking}"
+            app:visibleGone="@{viewModel.state == CycleState.SPEAKING}"
             android:onClick="@{() -> viewModel.stopSpeaking()}"
             android:layout_width="@dimen/big_btn_size"
             android:layout_height="@dimen/big_btn_size"
@@ -51,6 +53,20 @@
                 android:padding="@dimen/big_btn_icon_padding"
                 android:src="@drawable/ic_baseline_stop_24" />
         </androidx.cardview.widget.CardView>
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/thinkingAnim"
+            app:visibleGone="@{viewModel.state == CycleState.SEARCHING}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:lottie_rawRes="@raw/thinking"
+            app:lottie_loop="true"
+            app:lottie_autoPlay="true" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

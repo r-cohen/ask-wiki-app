@@ -15,6 +15,7 @@ import android.util.Log
 import androidx.annotation.UiThread
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.r.cohen.askwiki.models.CycleState
 import com.r.cohen.askwiki.repos.wikipedia.WikiApi
 import com.r.cohen.askwiki.repos.witai.WitAiApi
 import kotlinx.coroutines.CoroutineScope
@@ -34,23 +35,23 @@ class MainViewModel: ViewModel() {
     private lateinit var tts: TextToSpeech
     private var ttsListener = object: UtteranceProgressListener() {
         override fun onStart(utteranceId: String?) {
-            isSpeaking.postValue(true)
+            state.postValue(CycleState.SPEAKING)
         }
 
         override fun onDone(utteranceId: String?) {
-            isSpeaking.postValue(false)
+            state.postValue(CycleState.IDLE)
         }
 
         @Deprecated("Deprecated in Java", ReplaceWith("isSpeaking.postValue(false)"))
         override fun onError(utteranceId: String?) {
-            isSpeaking.postValue(false)
+            state.postValue(CycleState.IDLE)
         }
     }
 
     val recognizingSpeech = MutableLiveData(false)
     val recognizedText = MutableLiveData("")
     val backgroundColor = MutableLiveData(getRandomColor())
-    val isSpeaking = MutableLiveData(false)
+    val state = MutableLiveData(CycleState.IDLE)
 
 
     fun startSpeechRecognition() {
@@ -94,6 +95,8 @@ class MainViewModel: ViewModel() {
 
             override fun onResults(results: Bundle?) {
                 results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.let { texts ->
+                    state.postValue(CycleState.SEARCHING)
+
                     val sentence = texts.joinToString(separator = " ")
                     Log.d(tag, "recognized text $sentence")
                     recognizedText.postValue(sentence)
@@ -106,6 +109,8 @@ class MainViewModel: ViewModel() {
                                     Log.d(tag, "result $result")
                                     val textResponse = Html.fromHtml(result, Html.FROM_HTML_MODE_COMPACT)
                                     speak(textResponse.toString())
+
+                                    state.postValue(CycleState.IDLE)
                                 } ?: handleParseFailure()
                             } ?: handleParseFailure()
                         } ?: handleParseFailure()
@@ -116,6 +121,7 @@ class MainViewModel: ViewModel() {
     }
 
     fun handleParseFailure() {
+        state.postValue(CycleState.IDLE)
         speak(resources.getString(R.string.sorry_didnt_get_that))
     }
 
@@ -147,7 +153,7 @@ class MainViewModel: ViewModel() {
     fun stopSpeaking() {
         if (ttsInitialized) {
             tts.stop()
-            isSpeaking.postValue(false)
+            state.postValue(CycleState.IDLE)
         }
     }
 
